@@ -18,9 +18,9 @@ normally mean probing every candidate location.
 
 The paper avoids that with a two-stage pipeline:
 
-1. **Reconstruction.** The aperture is probed at only `M` locations. A
-   super-resolution network reconstructs the full 128 × 128 SNR map from those
-   `M` observations. With `M = 1024` this is 6.25 % of the grid; with `M = 64`
+1. **Reconstruction.** The aperture is characterized using only `M` finite-resolution spatial
+   observations. A super-resolution network reconstructs the full 128 × 128 SNR
+   map from these observations. With `M = 1024` this is 6.25 % of the grid; with `M = 64`
    it is 0.39 %.
 
 2. **Placement.** A placement network (PO) reads the reconstructed map and
@@ -28,8 +28,9 @@ The paper avoids that with a two-stage pipeline:
    gradient-based refinement then polishes them, and a feasibility correction
    guarantees the minimum-spacing constraint is met.
 
-The claim is that this reaches near-exhaustive-search placement quality at a
-small fraction of the probing and search cost.
+The paper shows that the proposed method approaches the dense-grid placement
+reference while using substantially fewer probing observations and online
+objective evaluations.
 
 ### Setup common to every experiment below
 
@@ -43,11 +44,10 @@ small fraction of the probing and search cost.
 | Placement training | spacing-penalty weight `λ_d = 0.1` |
 | Inference refinement | `N_ref = 150 / 500 / 100` for `M = 64 / 256 / 1024`, no repulsion term |
 
-**Reference and regret.** Several figures report *placement regret*: the SNR of
-a greedy exhaustive search over the discrete grid, minus the SNR the method
-achieves, on the same reconstructed map. Lower is better; zero means the
-learned placement matched an exhaustive search that evaluated all 16 384 points
-per antenna.
+**Reference and regret.** Several figures report *placement regret*: the SNR of the grid-based greedy
+reference minus the SNR achieved by the proposed method, evaluated on the same
+reconstructed map. Lower is better; zero means the learned placement matched the grid-based greedy reference, which
+evaluates all 16 384 grid points at each antenna-placement step.
 
 ---
 
@@ -55,8 +55,8 @@ per antenna.
 
 ### 2.1 Placement regret and top-5 % hit rate versus observation budget
 
-How much does the placement stage give up against an exhaustive grid search,
-and how often does it land in the strongest 5 % of the aperture?
+How much does the placement stage give up relative to the grid-based greedy
+reference, and how often does it land in the strongest 5 % of the aperture?
 
 ![Placement regret and top-5% hit rate](docs/figures/fig_po_regret.png)
 
@@ -88,16 +88,16 @@ steps**. Only the initialization differs.
 | 1024 | −6.842 | −8.256 | **+1.414 dB** | 0.272 → 1.685 | 0.990 vs 0.735 |
 
 At an identical search budget the learned initialization is worth 1.3–1.4 dB,
-and it raises the top-5 % hit rate from roughly 0.7 to roughly 1.0. The
-refinement cannot recover this on its own: random starts converge to
-substantially worse local optima. This is the direct evidence that the learned
+and it raises the top-5 % hit rate from roughly 0.7 to roughly 1.0. Under the evaluated refinement budgets, random initialization converges to
+substantially worse solutions, showing that the learned initialization provides
+information that is not recovered by local refinement alone within the same
+online search budget. This is the direct evidence that the learned
 stage contributes something the local optimizer does not.
 
 ### 2.3 Which reconstruction method feeds the placement
 
 The placement network is held **fixed** — the same trained network for every
-bar — and only the reconstruction feeding it is swapped. Any difference is
-therefore attributable to the reconstruction alone. `Nearest` and `Bicubic` are
+bar — and only the reconstruction feeding it is swapped. This isolates the effect of the reconstructed input under a fixed PO model. `Nearest` and `Bicubic` are
 the no-learning condition: the sparse observations are simply upsampled.
 
 ![Placement SNR per reconstruction method](docs/figures/fig_abl_recon.png)
@@ -109,9 +109,10 @@ the no-learning condition: the sparse observations are simply upsampled.
 | 1024 | −7.904 | −7.630 | −6.843 | −6.845 | −6.835 | −6.842 |
 
 Learned reconstruction is worth 1.9–2.1 dB over interpolation at `M = 64` and
-0.8–1.1 dB at `M = 1024`. Among the learned backbones the spread is 0.010 dB at
-`M = 1024` — once the map is accurate enough, the backbone stops mattering and
-the placement stage becomes the binding term. The dashed line is a fixed-position
+0.8–1.1 dB at `M = 1024`. Among the learned backbones, the spread is only 0.010 dB at `M = 1024`,
+indicating that once the reconstructed maps reach sufficiently high fidelity,
+the remaining backbone differences have negligible impact on downstream
+placement performance. The dashed line is a fixed-position
 array (no placement adaptation), about 6–7 dB below every adaptive scheme.
 
 ### 2.4 Refinement budget and restart set size
@@ -134,16 +135,16 @@ Regret in dB:
 Two things follow. First, refinement is not optional but saturates quickly: at
 `M = 1024` the network output alone gives 1.745 dB regret, 25 steps bring it to
 0.390, and everything beyond that is a slow tail — the default budget sits well
-inside the flat region. Second, **`|S| = 8` is worse than `|S| = 4` at every
-budget** despite costing twice as much. The larger set is not a superset; it
+inside the flat region. Second, **`|S| = 8` is worse than `|S| = 4` for all three observation budgets,** 
+despite requiring twice as many candidate refinements. The larger set is not a superset; it
 drops the heatmap-derived candidates in favour of symmetry transforms, and those
 are the weaker starting points. The cheaper configuration is also the better one.
 
 ### 2.5 Sensitivity to the user-location model
 
-The networks are trained with the user direction drawn at random per
-realization. This evaluates them unchanged on a fixed user location, to check
-that nothing has been memorized about the training geometry.
+The networks are trained with a randomly drawn user direction for each
+realization. We evaluate the same trained models at a fixed user location to
+assess sensitivity to the user-location distribution used during training.
 
 ![Random versus fixed user location](docs/figures/fig_user_model.png)
 
@@ -153,9 +154,10 @@ that nothing has been memorized about the training geometry.
 | 256 | 0.324 | 0.322 |
 | 1024 | 0.271 | 0.259 |
 
-Regret is unchanged to within 0.012 dB. The absolute SNR shifts slightly because
-a fixed direction gives a marginally different channel, but the part the
-placement stage is responsible for does not move.
+The placement regret changes by at most 0.012 dB between the two user-location
+models, indicating negligible sensitivity of the placement stage to this change
+in the user-location distribution. The absolute SNR shifts slightly because the
+fixed user direction induces a marginally different channel distribution.
 
 ### 2.6 Effect of the minimum-spacing penalty weight
 
@@ -167,7 +169,7 @@ validation sweep; everything else was held fixed.
 
 Scored on the reconstructed map, 5 000 realizations:
 
-| `M` | | proposed | grid reference | sequential update |
+| `M` | `λ_d` | proposed | grid reference | sequential update |
 |---:|---|---:|---:|---:|
 | 64 | `λ_d = 0` | −8.076 | −7.873 | −8.104 |
 | | **`λ_d = 0.1`** | **−7.987** | −7.873 | −8.104 |
@@ -182,8 +184,8 @@ a zero violation rate after it. What changes is how much correction is needed,
 and therefore how far the corrected positions end up from what the network
 intended.
 
-The effect is largest at `M = 1024`: regret drops from 0.456 to 0.271 dB, and
-the method moves from **losing** to the sequential-update baseline (−7.027
-against −6.913) to **beating** it (−6.842 against −6.913). With `λ_d = 0.1` the
-proposed placement is ahead of sequential update at all three observation
-budgets.
+The effect is largest at `M = 1024`, where the regret decreases from 0.456 to
+0.271 dB. The proposed method changes from underperforming sequential update
+with `λ_d = 0` (−7.027 vs. −6.913 dB) to outperforming it with `λ_d = 0.1`
+(−6.842 vs. −6.913 dB). With `λ_d = 0.1`, the proposed placement outperforms
+sequential update at all three observation budgets.
