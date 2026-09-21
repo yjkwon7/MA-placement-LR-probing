@@ -206,6 +206,22 @@ a zero violation rate after it. What changes is how much correction is needed,
 and therefore how far the corrected positions end up from what the network
 intended.
 
+### 2.8 Robustness to observation noise
+
+All preceding experiments use the nominal observation-noise level employed
+during training. Here, the trained reconstruction and placement checkpoints are
+kept fixed while only the observation-noise level is changed at test time.
+This experiment therefore evaluates robustness to observation-noise mismatch
+without retraining.
+
+Let `δ_n` denote the standard deviation of the additive observation noise and
+let `δ_{n,0} = 8e-4` denote the nominal training level. We define the
+noise-induced received-SNR loss as
+
+```text
+L_noise(a) =
+    SNR_true(δ_{n,0}) − SNR_true(a · δ_{n,0}),
+
 The effect is largest at `M = 1024`, where the regret decreases from 0.456 to
 0.271 dB. The proposed method changes from underperforming sequential update
 with `λ_d = 0` (−7.027 vs. −6.913 dB) to outperforming it with `λ_d = 0.1`
