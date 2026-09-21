@@ -159,7 +159,30 @@ models, indicating negligible sensitivity of the placement stage to this change
 in the user-location distribution. The absolute SNR shifts slightly because the
 fixed user direction induces a marginally different channel distribution.
 
-### 2.6 Effect of the minimum-spacing penalty weight
+### 2.6 Sensitivity to the BS–user distance
+
+The reconstruction and PO networks are trained at the nominal BS–user distance
+`d_BU = 24 m` and are evaluated unchanged at other distances, without
+retraining. This experiment examines whether the final placement procedure
+remains stable when the large-scale channel gain differs from the training
+condition.
+
+![Sensitivity to the BS–user distance](docs/figures/fig_distance.png)
+
+Across the eight evaluated distances and all three observation budgets, the
+placement-stage SNR difference remains within approximately −0.38 to 0.30 dB
+and does not increase systematically as the operating distance moves away from
+the training condition. The distance-dependent variation is non-monotonic:
+the difference remains close to zero for `M = 64` and becomes negative at
+several larger distances for `M = 256` and `M = 1024`.
+
+Negative values can occur because the grid-based greedy reference is restricted
+to discrete HR-grid locations, whereas the proposed method refines the antenna
+coordinates continuously. At some distances, continuous refinement therefore
+identifies off-grid positions with higher true-channel received SNR than the
+grid-restricted reference.
+
+### 2.7 Effect of the minimum-spacing penalty weight
 
 The placement training objective carries a penalty `λ_d · P_d` on antenna pairs
 closer than the minimum spacing. An earlier configuration used `λ_d = 0`, which
