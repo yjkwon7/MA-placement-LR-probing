@@ -1,11 +1,10 @@
 # Supplementary experiments
 
 Additional results for the paper on movable-antenna (MA) placement from
-reconstructed spatial channel maps. These experiments did not fit in the
-manuscript; they are collected here so the paper can point to them.
+reconstructed spatial channel maps. This repository provides supplementary experimental results and reproducibility details that complement the results reported in the main manuscript.
 
-This repository hosts the results only. The simulation and training code is not
-released.
+The repository contains supplementary results and evaluation details only.
+The simulation and training code is not released.
 
 ---
 
