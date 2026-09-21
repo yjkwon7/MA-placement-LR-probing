@@ -167,7 +167,7 @@ retraining. This experiment examines whether the final placement procedure
 remains stable when the large-scale channel gain differs from the training
 condition.
 
-![Sensitivity to the BS–user distance](docs/figures/fig_distance4.pdf)
+![Sensitivity to the BS–user distance](docs/figures/fig_distance.png)
 
 Across the eight evaluated distances and all three observation budgets, the
 placement-stage SNR difference remains within approximately −0.38 to 0.30 dB
