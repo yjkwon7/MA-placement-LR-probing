@@ -93,7 +93,7 @@ information that is not recovered by local refinement alone within the same
 online search budget. This is the direct evidence that the learned
 stage contributes something the local optimizer does not.
 
-### 2.3 Which reconstruction method feeds the placement
+### 2.3 Reconstruction effects on downstream placement
 
 The placement network is held **fixed** — the same trained network for every
 bar — and only the reconstruction feeding it is swapped. This isolates the effect of the reconstructed input under a fixed PO model. `Nearest` and `Bicubic` are
@@ -113,6 +113,14 @@ indicating that once the reconstructed maps reach sufficiently high fidelity,
 the remaining backbone differences have negligible impact on downstream
 placement performance. The dashed line is a fixed-position
 array (no placement adaptation), about 6–7 dB below every adaptive scheme.
+
+#### Greedy placement on each reconstructed map
+
+The fixed-PO comparison above measures how the input reconstruction affects a common placement network. As a complementary reconstruction-only evaluation, we also perform the same grid-based greedy placement independently on each reconstructed HR map and evaluate the selected antenna coordinates on the corresponding true channel realization.
+
+![Reconstruction-induced placement difference](docs/figures/fig_recon_placement.png)
+
+The learning-based reconstruction methods substantially reduce the reconstruction-induced placement difference relative to bicubic interpolation across the considered observation budgets. At `M = 1024`, the downstream true-channel SNRs obtained from the learned reconstruction methods differ by only about 0.01 dB, indicating that once the reconstructed maps reach sufficiently high fidelity, the choice among the learned backbones has little impact on the subsequent placement result.
 
 ### 2.4 Refinement budget and restart set size
 
