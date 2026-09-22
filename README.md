@@ -214,24 +214,29 @@ a zero violation rate after it. What changes is how much correction is needed,
 and therefore how far the corrected positions end up from what the network
 intended.
 
+The effect is largest at `M = 1024`, where the regret decreases from 0.456 to 0.271 dB. The proposed method changes from underperforming sequential update with `λ_d = 0` (−7.027 vs. −6.913 dB) to outperforming it with `λ_d = 0.1` (−6.842 vs. −6.913 dB). With `λ_d = 0.1`, the proposed placement outperforms sequential update at all three observation budgets.
+
 ### 2.8 Robustness to observation noise
 
-All preceding experiments use the nominal observation-noise level employed
-during training. Here, the trained reconstruction and placement checkpoints are
-kept fixed while only the observation-noise level is changed at test time.
-This experiment therefore evaluates robustness to observation-noise mismatch
-without retraining.
+All preceding experiments use the nominal observation-noise level employed during training. Here, the trained reconstruction and placement checkpoints are kept fixed while only the observation-noise level is changed at test time. This experiment therefore evaluates robustness to observation-noise mismatch without retraining.
 
-Let `δ_n` denote the standard deviation of the additive observation noise and
-let `δ_{n,0} = 8e-4` denote the nominal training level. We define the
-noise-induced received-SNR loss as
+Let `δ_n` denote the standard deviation of the additive observation noise and let `δ_{n,0} = 8e-4` denote the nominal training level. We define
 
-```text
-L_noise(a) =
-    SNR_true(δ_{n,0}) − SNR_true(a · δ_{n,0}),
+`L_noise(a) = SNR_true(δ_{n,0}) − SNR_true(a · δ_{n,0})`,
 
-The effect is largest at `M = 1024`, where the regret decreases from 0.456 to
-0.271 dB. The proposed method changes from underperforming sequential update
-with `λ_d = 0` (−7.027 vs. −6.913 dB) to outperforming it with `λ_d = 0.1`
-(−6.842 vs. −6.913 dB). With `λ_d = 0.1`, the proposed placement outperforms
-sequential update at all three observation budgets.
+where `a = δ_n/δ_{n,0}`. Positive values indicate degradation relative to the nominal condition. The noise level is reported as a ratio rather than in dB because the perturbation is added in the linear SNR domain.
+
+All noise levels use the same 5 000 held-out channel realizations and the same underlying standard-normal noise samples, scaled only by `δ_n`. Parentheses below denote the half-width of the paired 95 % confidence interval.
+
+| `δ_n/δ_{n,0}` | `M = 64` | `M = 256` | `M = 1024` |
+|---:|---:|---:|---:|
+| 0 | −0.059 (0.051) | −0.015 (0.015) | −0.001 (0.005) |
+| 0.5 | −0.067 (0.045) | −0.012 (0.011) | +0.002 (0.005) |
+| 1 | 0 | 0 | 0 |
+| 2 | 0.220 (0.054) | 0.216 (0.022) | 0.021 (0.006) |
+| 4 | 0.662 (0.067) | 0.804 (0.040) | 0.086 (0.011) |
+| 8 | 1.402 (0.081) | 1.721 (0.057) | 0.230 (0.015) |
+
+The highest probing density is markedly more robust to test-time noise mismatch. At `M = 1024`, doubling the observation-noise standard deviation causes only 0.021 dB loss, while even an eightfold increase results in only 0.230 dB degradation without retraining. The two lower-resolution settings exhibit substantially larger degradation under severe noise.
+
+The ordering between `M = 64` and `M = 256` is not monotonic at high noise levels. This should not be interpreted as greater intrinsic robustness at `M = 64`, because the coarsest observation setting already loses substantial spatial information through finite-resolution aggregation under the nominal condition.
