@@ -31,6 +31,42 @@ The paper shows that the proposed method approaches the dense-grid placement
 reference while using substantially fewer probing observations and online
 objective evaluations.
 
+### Notation used in the manuscript
+
+| Symbol | Description |
+|---|---|
+| $K$ | Number of movable antennas (MAs) at the BS |
+| $\mathcal{K}=\{1,\ldots,K\}$ | Set of MA indices |
+| $L_x,L_y$ | Horizontal and vertical dimensions of the movement aperture |
+| $H,W$ | Numbers of HR grid points along the aperture dimensions |
+| $\mathcal{D}$ | Continuous MA movement aperture |
+| $\mathcal{A}$ | $H\times W$ grid used for spatial channel representation |
+| $\mathbf r_k$ | Continuous position of MA $k$ |
+| $\mathbf R$ | $K\times2$ MA placement matrix |
+| $d_{\min}$ | Minimum allowable inter-MA spacing |
+| $d_{\mathrm{ap}}$ | Diagonal length of the movement aperture |
+| $h(\mathbf r)$ | Complex channel coefficient at position $\mathbf r$ |
+| $G(\mathbf r)$ | Channel power gain at position $\mathbf r$ |
+| $\rho=P_{\max}/\sigma^2$ | Transmit-power-to-noise ratio |
+| $\Gamma(\mathbf r)$ | Local received-SNR contribution at position $\mathbf r$ |
+| $\boldsymbol{\Gamma}$ | HR spatial SNR map |
+| $\boldsymbol{\Gamma}_{\mathrm{LR}}$ | Finite-resolution LR spatial probing map |
+| $\tilde{\boldsymbol{\Gamma}}_{\mathrm{LR}}$ | Noisy LR spatial probing map |
+| $\hat{\boldsymbol{\Gamma}}$ | Reconstructed HR spatial SNR map |
+| $\hat{\Gamma}_{\mathrm c}(\mathbf r)$ | Continuous reconstructed SNR representation obtained by bilinear interpolation |
+| $M$ | Number of spatial probing observations |
+| $s$ | Spatial probing / super-resolution scale factor |
+| $\delta_n$ | Standard deviation of additive probing noise in the linear SNR domain |
+| $\gamma(\mathbf R)$ | Received SNR for placement $\mathbf R$ |
+| $\eta(\mathbf R)$ | Achievable spectral efficiency for placement $\mathbf R$ |
+| $F(\mathbf R)$ | True-channel placement objective |
+| $\hat F(\mathbf R)$ | Reconstructed-map placement objective |
+| $\varepsilon_{\mathrm{map}}$ | Uniform spatial-map approximation error |
+| $\Delta_{\mathrm{opt}}$ | Residual placement-optimization error on the reconstructed spatial surface |
+| $\lambda_d$ | Minimum-spacing penalty weight used for PO training |
+| $\lambda_r$ | Repulsion-term weight used for PO training |
+| $N_{\mathrm{ref}}$ | Number of inference-time continuous-refinement iterations |
+
 ### Setup common to every experiment below
 
 | | |
